@@ -7,6 +7,12 @@ output:
 
 
 ## Loading and preprocessing the data
+```{r}
+library(ggplot2)
+data<-read.csv("activity.csv")
+stepsdata <- na.omit(data) #remove NA data
+stepsdata$date <- as.Date(stepsdata$date) #convert date into factor
+```
 
 
 
