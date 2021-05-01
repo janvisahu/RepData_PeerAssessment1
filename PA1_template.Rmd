@@ -45,7 +45,7 @@ median(y$x,na.rm=TRUE)
 
 ## What is the average daily activity pattern?
 
-\#\#\#find mean steps taken grouped by interval
+Find mean steps taken grouped by interval
 
 ```{r}
 library(dplyr)
@@ -56,13 +56,13 @@ z
 
 ```
 
-\#\#\#time series plot
+Time series plot
 
 ```{r}
 ggplot(z, aes(x = interval , y = mean_steps)) + geom_line(color="sky blue", size=1) + labs(title = "Avg. Daily Steps", x = "Interval", y = "Avg. Steps per day")
 ```
 
-\#\#\#find the interval with maximum mean of steps
+Find the interval with maximum mean of steps
 
 ```{r}
 
@@ -71,8 +71,7 @@ maxstepinterval
 ```
 
 ## Imputing missing values
-
-\#\#\#the number of missing values
+The number of missing values
 
 ```{r}
 a<-nrow(data)
@@ -80,7 +79,7 @@ b<-nrow(stepsdata)
 a-b
 ```
 
-\#\#\#The number of missing values 2304
+The number of missing values 2304
 
  Create a filled in dataset by assigning the average value for that time interval is NA is found.
 ```{r}
