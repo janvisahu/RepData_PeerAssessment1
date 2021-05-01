@@ -1,31 +1,32 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
+title: "Reproducible Research: Peer Assessment 1 by JANVI SAHU"
 output: 
   html_document:
     keep_md: true
 ---
 
-
 ## Loading and preprocessing the data
+
 ```{r}
 library(ggplot2)
+data<-unzip("activity.zip")
 data<-read.csv("activity.csv")
 stepsdata <- na.omit(data) #remove NA data
 stepsdata$date <- as.Date(stepsdata$date) #convert date into factor
 ```
 
-
-
 ## What is mean total number of steps taken per day?
-###calculate the total number of steps taken per day
+
+Calculate the total number of steps taken per day
 
 ```{r}
 y<-aggregate(x = stepsdata$steps,                # Specify data column
           by = list(stepsdata$date),              # Specify group indicator
           FUN = sum) 
 head(y,10)
-``` 
-###histogram for the total number of steps per day
+```
+
+Histogram for the total number of steps per day
 
 ```{r}
 hist(y$x, 
@@ -34,20 +35,117 @@ hist(y$x,
      main="Histogram of total number of steps taken each day",
      col=5)
 ```
-###Calculate and report the mean and median of the total number of steps taken per day
+
+\#\#\#Calculate and report the mean and median of the total number of steps taken per day
+
 ```{r}
 mean(y$x,na.rm=TRUE)
 median(y$x,na.rm=TRUE)
 ```
 
-
-
 ## What is the average daily activity pattern?
 
+\#\#\#find mean steps taken grouped by interval
 
+```{r}
+library(dplyr)
+z<-stepsdata %>%
+group_by(interval) %>%
+summarize(mean_steps= mean(steps))
+z
+
+```
+
+\#\#\#time series plot
+
+```{r}
+ggplot(z, aes(x = interval , y = mean_steps)) + geom_line(color="sky blue", size=1) + labs(title = "Avg. Daily Steps", x = "Interval", y = "Avg. Steps per day")
+```
+
+\#\#\#find the interval with maximum mean of steps
+
+```{r}
+
+maxstepinterval <- z$interval[which.max(z$mean_steps)]
+maxstepinterval
+```
 
 ## Imputing missing values
 
+\#\#\#the number of missing values
 
+```{r}
+a<-nrow(data)
+b<-nrow(stepsdata)
+a-b
+```
 
+\#\#\#The number of missing values 2304
+
+ Create a filled in dataset by assigning the average value for that time interval is NA is found.
+```{r}
+filldata <-data
+for (i in 1:nrow(filldata)) {
+    if (is.na(filldata$steps[i])) {
+        # Find the index value for when the interval matches the average
+        index <- which(filldata$interval[i] ==z$interval)
+        # Assign the value to replace the NA
+        filldata$steps[i] <- z[index,]$mean_steps
+    }
+}
+filldata$date <- as.Date(filldata$date) 
+```
+Histogram of the total number of steps taken each day
+```{r}
+h<-filldata %>%
+group_by(date) %>%
+summarize(total_steps= sum(steps))
+
+hist( h$total_steps, xlab="Number of steps", ylab="count", main="Histogram of number of steps")
+```
+MEAN AND MEDIAN OF STEPS IN THE NEW DATASET
+```{r}
+fillmeansteps <- mean(h$total_steps)
+fillmediansteps <- median(h$total_steps
+                          )
+fillmediansteps
+
+```
+
+The mean total number of steps per day is 10766.19 and the median is 10766.19.
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r}
+
+
+
+# Make weekday variable
+filldata$day <- weekdays(filldata$date)
+# Define all days as weekdays
+filldata$daytype <- "weekday"
+# Fix days that are saturday or sunday to be weekends
+filldata$daytype[filldata$day %in% c("Saturday", "Sunday")] <- "weekend"
+```
+Calculate the average weekday steps versus average weekend steps
+```{r}
+
+
+
+# Group data by 5 minute interval and summarize the average
+# number of steps in that interval
+dayaverage <- filldata %>%
+    group_by(daytype, interval) %>%
+    summarize(AverageSteps=mean(steps))
+```
+
+    
+```{r}
+qplot(interval, AverageSteps, data=dayaverage,
+      type="l",
+      geom="line",
+      xlab="Interval",
+      ylab="Number of Steps (Average)",
+      main="Average steps taken Weekends vs. Weekdays",
+      facets =daytype ~ .)
+```
+
+
