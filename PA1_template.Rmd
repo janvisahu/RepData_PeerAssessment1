@@ -17,6 +17,28 @@ stepsdata$date <- as.Date(stepsdata$date) #convert date into factor
 
 
 ## What is mean total number of steps taken per day?
+###calculate the total number of steps taken per day
+
+```{r}
+y<-aggregate(x = stepsdata$steps,                # Specify data column
+          by = list(stepsdata$date),              # Specify group indicator
+          FUN = sum) 
+head(y,10)
+``` 
+###histogram for the total number of steps per day
+
+```{r}
+hist(y$x, 
+     xlab="Total number of steps taken each day", 
+     ylab="Count", 
+     main="Histogram of total number of steps taken each day",
+     col=5)
+```
+###Calculate and report the mean and median of the total number of steps taken per day
+```{r}
+mean(y$x,na.rm=TRUE)
+median(y$x,na.rm=TRUE)
+```
 
 
 
